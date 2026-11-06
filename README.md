@@ -1,54 +1,52 @@
-#   Web Scraping avec Python – TimesJobs
+# Python Job Finder
+### Turn a job-results page into a shortlist you can read locally.
 
-Ce projet a pour objectif de démontrer l'utilisation de **Python** pour effectuer du **web scraping** sur le site [TimesJobs](https://m.timesjobs.com). Le but est de récupérer automatiquement des offres d'emploi en lien avec des compétences spécifiques (comme Python, data, etc.), et de les stocker localement.
+Searching through job listings is easier when irrelevant skills are filtered out first. This Python scraper reads TimesJobs Python listings, keeps recent posts, excludes skills entered by the user, and saves each matching offer as a readable text file.
 
----
+For example, enter `java,php` at the prompt to skip offers listing those skills. Open the saved files to see the company, role, posting date, skills, and original job link.
 
-##   Structure du projet
+## Small details that make the output useful
 
-Voici la structure globale des dossiers et leur rôle :
+- **Filtering happens before writing.** The scraper parses posting dates and compares normalized skill names against the exclusion list, so the saved folder reflects the requested shortlist. `DAYS_FILTER_LIMIT` is set to 10 in the script.
+- **Files stay readable and separate.** Company and role form the filename, invalid filename characters are replaced, and numeric suffixes avoid overwriting previous results. Requests have a timeout and HTTP errors are handled before parsing.
 
+### A real saved record
 
-web_scraping_project/
-│
-├── venv/
-│    Environnement virtuel Python, utilisé pour isoler les bibliothèques nécessaires au projet.
-│
-├── offres_emploi_python/
-│    Dossier contenant les offres d’emploi extraites depuis le site TimesJobs.
-│
-├── Test With Local File/
-│    Dossier contenant un test local avec un fichier HTML statique pour s'entraîner à parser avec BeautifulSoup.
-│
-├── Scraping A Production Website/
-│    Dossier principal du projet contenant le code final de scraping à partir du site réel.
-│ └── main.py
-│
-└── README.md
- Ce fichier de documentation.
+From [the collected examples](offres_emploi_python/):
 
+```text
+Compagnie: Datagrid Solutions
+Poste: Python Developer
+Date de publication: 10 days ago
+Compétences: python, database, django, mysql, api
+```
 
- ##  Bibliothèques Python utilisées
+These are saved examples from collection time, not current vacancies. Each full record also includes the source URL.
 
-Le projet utilise les bibliothèques suivantes :
+## Try it
 
-- [`requests`](https://pypi.org/project/requests/) : Pour envoyer des requêtes HTTP et récupérer le contenu des pages web.
+Use Python 3 and run commands from the repository root:
 
-- [`beautifulsoup4`](https://pypi.org/project/beautifulsoup4/) : Pour parser le HTML et extraire les données souhaitées.
+```bash
+git clone https://github.com/Jabour-Salahddine/Web-Scraping-Intro.git
+cd Web-Scraping-Intro
+python -m venv venv
+source venv/bin/activate
+python -m pip install beautifulsoup4 requests lxml
+python "Scraping A Production Website/main.py"
+```
 
-- [`lxml`](https://pypi.org/project/lxml/) : Un parseur rapide et efficace pour BeautifulSoup.
+On Windows Git Bash, activate with `source venv/Scripts/activate` instead. Enter comma-separated skills to exclude, or press Enter for no exclusions. Results are written to `offres_emploi_python/`. The script repeats after a 400-second wait; press **Ctrl+C** to stop. Later runs create additional files rather than deduplicating earlier scans.
 
+For a quick offline introduction to the HTML parser:
 
+```bash
+python "Test With Local File/main.py"
+deactivate
+```
 
-Créer un environnement virtuel : 
-    python -m venv venv
+The local exercise reads [home.html](Test%20With%20Local%20File/home.html). The live scraper depends on TimesJobs' HTML structure and network availability. Use it in line with the source site's access rules.
 
-Activer l’environnement virtuel (sous windows bash) :
-    source venv/Scripts/activate
+## Follow the implementation
 
-Installer les dépendances : 
-    pip install beautifulsoup4 requests lxml
-
-Désactiver l'environnement virtuel : 
-    deactivate
-
+Start with [the scraper](Scraping%20A%20Production%20Website/main.py): fetch → parse → date filter → skill filter → text files. The local HTML exercise demonstrates BeautifulSoup selection separately from network requests.
